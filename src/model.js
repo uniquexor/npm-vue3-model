@@ -1,6 +1,6 @@
 import { Model as PiniaModel } from 'pinia-orm';
 import {reactive, ref} from "vue";
-import Response from 'response.js';
+import Response from './response.js';
 import {useAxiosRepo} from "@pinia-orm/axios";
 
 export default class Model extends PiniaModel {
