@@ -21,6 +21,25 @@ export default class Model extends PiniaModel {
         return this[ this.constructor.primaryKey ] === null;
     }
 
+    /**
+     * Returns a field => label object.
+     * @returns {Object.<string, string>}
+     */
+    static labels() {
+        return {}
+    }
+
+    /**
+     * Returns a label for the given field name.
+     * Labels must be defined in {@link Model.labels()}
+     * @param {string} field
+     * @returns {string|null}
+     */
+    getAttributeLabel( field ) {
+
+        return this.constructor.labels()[ field ] ?? null;
+    }
+
     async save( request = {} ) {
 
         let result = null;
