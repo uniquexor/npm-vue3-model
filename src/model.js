@@ -369,6 +369,23 @@ export default class Model extends PiniaModel {
         return errors.join( '; ' );
     }
 
+    /**
+     * Sets attributes from a given data object/array
+     * @param {Object|Array} data
+     */
+    setAttributes( data ) {
+
+        const fields = this.constructor.fields();
+
+        for ( let i in data ) {
+
+            if ( typeof( fields[ i ] ) !== 'undefined' ) {
+
+                this[ i ] = data[ i ];
+            }
+        }
+    }
+
     static afterUpdate( model ) {
 
         model.updateOldValues( model );
