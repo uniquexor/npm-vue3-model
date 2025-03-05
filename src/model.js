@@ -29,6 +29,54 @@ export default class Model extends PiniaModel {
         return {}
     }
 
+    static relations() {
+        return {}
+    }
+
+    constructor( attributes, options = {} ) {
+
+        super( {}, { fill: false } );
+
+        const relations = this.constructor.relations();
+        for ( const field in relations ) {
+
+            if ( attributes[ field ] ) {
+
+                const rel_field = relations[ field ];
+                const ids = [];
+                for ( const item of attributes[ field ] ) {
+
+                    ids.push( item[ rel_field ] );
+                }
+
+                attributes[ field ] = ids;
+            }
+        }
+
+        this.$fill( attributes, options );
+    }
+
+    $toJson( model, options ) {
+
+        const data = super.$toJson( model, options );
+
+        const relations = this.constructor.relations();
+        for ( const field in relations ) {
+
+            if ( data[ field ] ) {
+
+                const rel_field = relations[ field ];
+                data[ field ] = data[ field ].map( ( id ) => {
+                    const obj = {};
+                    obj[ rel_field ] = id;
+                    return obj;
+                } );
+            }
+        }
+
+        return data;
+    }
+
     /**
      * Returns a label for the given field name.
      * Labels must be defined in {@link Model.labels()}
