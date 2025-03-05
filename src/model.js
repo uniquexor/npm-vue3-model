@@ -40,7 +40,7 @@ export default class Model extends PiniaModel {
         const relations = this.constructor.relations();
         for ( const field in relations ) {
 
-            if ( attributes[ field ] ) {
+            if ( attributes && attributes[ field ] ) {
 
                 const rel_field = relations[ field ];
                 const ids = [];
@@ -63,7 +63,7 @@ export default class Model extends PiniaModel {
         const relations = this.constructor.relations();
         for ( const field in relations ) {
 
-            if ( data[ field ] ) {
+            if ( data && data[ field ] ) {
 
                 const rel_field = relations[ field ];
                 data[ field ] = data[ field ].map( ( id ) => {
