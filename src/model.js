@@ -29,7 +29,7 @@ export default class Model extends PiniaModel {
         return {}
     }
 
-    static relations() {
+    static transformers() {
         return {}
     }
 
@@ -37,16 +37,16 @@ export default class Model extends PiniaModel {
 
         super( {}, { fill: false } );
 
-        const relations = this.constructor.relations();
-        for ( const field in relations ) {
+        const transformers = this.constructor.transformers();
+        for ( const field in transformers ) {
 
             if ( attributes && attributes[ field ] ) {
 
-                const rel_field = relations[ field ];
+                const transformer = transformers[ field ];
                 const ids = [];
                 for ( const item of attributes[ field ] ) {
 
-                    ids.push( item[ rel_field ] );
+                    ids.push( transformer.get.call( this, item ) );
                 }
 
                 attributes[ field ] = ids;
@@ -60,16 +60,15 @@ export default class Model extends PiniaModel {
 
         const data = super.$toJson( model, options );
 
-        const relations = this.constructor.relations();
-        for ( const field in relations ) {
+        const transformers = this.constructor.transformers();
+        for ( const field in transformers ) {
 
             if ( data && data[ field ] ) {
 
-                const rel_field = relations[ field ];
+                const transformer = transformers[ field ];
                 data[ field ] = data[ field ].map( ( id ) => {
-                    const obj = {};
-                    obj[ rel_field ] = id;
-                    return obj;
+
+                    return transformer.set.call( this, id, data );
                 } );
             }
         }
@@ -113,7 +112,7 @@ export default class Model extends PiniaModel {
                     throw 'No endpoint set for a model';
                 }
 
-                result = await useAxiosRepo( this.constructor ).api().post( request.request.url, this, request.axios_params );
+                result = await useAxiosRepo( this.constructor ).api().post( request.request.url, this.$toJson( this ), request.axios_params );
             } else {
 
                 if ( !request.request.url ) {
@@ -122,7 +121,7 @@ export default class Model extends PiniaModel {
                     throw 'No endpoint set for a model';
                 }
 
-                result = await useAxiosRepo( this.constructor ).api().put( request.request.url, this, request.axios_params );
+                result = await useAxiosRepo( this.constructor ).api().put( request.request.url, this.$toJson( this ), request.axios_params );
             }
         } catch ( e ) {
 
