@@ -87,6 +87,62 @@ export default class Model extends PiniaModel {
         return this.constructor.labels()[ field ] ?? null;
     }
 
+    setErrorFieldsFromResult( result ) {
+
+        if ( result.response?.status === 422 ) {
+
+            for ( let i in result.response.data ) {
+
+                let error = result.response.data[ i ];
+                this.errors[ error.field ] = error.message;
+            }
+        } else if ( result.response && result.response.status !== 200 && result.response.status !== 201 ) {
+
+            this.error_message = result.response.statusText;
+        } else if ( !result.response ) {
+
+            this.error_message = result;
+        }
+    }
+
+    async validate( url, request ) {
+
+        let result = null;
+
+        this.clearErrors();
+
+        request = this.constructor._getOptions( {
+            url: url,
+            params: {},
+            axios: {}
+        }, request );
+
+        let error = null;
+        try {
+
+            if ( !request.request.url ) {
+
+                console.error( 'No endpoint set for a model', this );
+                throw 'No endpoint set for a model';
+            }
+
+            result = await useAxiosRepo( this.constructor ).api().post( request.request.url, this.$toJson( this ), request.axios_params );
+        } catch ( e ) {
+
+            error = e;
+            result = e;
+        }
+
+        this.setErrorFieldsFromResult( result );
+
+        if ( error ) {
+
+            throw error;
+        }
+
+        return result;
+    }
+
     async save( request = {} ) {
 
         let result = null;
@@ -129,21 +185,7 @@ export default class Model extends PiniaModel {
             result = e;
         }
 
-        if ( result.response?.status === 422 ) {
-
-            for ( let i in result.response.data ) {
-
-                let error = result.response.data[ i ];
-                this.errors[ error.field ] = error.message;
-            }
-        } else if ( result.response && result.response.status !== 200 && result.response.status !== 201 && this._default_error_field ) {
-
-            this.error_message = result.response.statusText;
-            this._errors = errors;
-        } else if ( !result.response && this._default_error_field ) {
-
-            this.error_message = result;
-        }
+        this.setErrorFieldsFromResult( result );
 
         if ( error ) {
 
