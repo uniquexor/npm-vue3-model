@@ -114,7 +114,9 @@ export default class Model extends PiniaModel {
         request = this.constructor._getOptions( {
             url: url,
             params: {},
-            axios: {}
+            axios: {
+                save: false
+            }
         }, request );
 
         let error = null;
