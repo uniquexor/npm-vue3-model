@@ -90,7 +90,7 @@ export default class Model extends PiniaModel {
     setErrorsOnModelFields( model, fields, message ) {
 
         const field = fields.shift();
-        if ( fields.length > 1 ) {
+        if ( fields.length > 0 ) {
 
             this.setErrorsOnModelFields( model[ field ], fields, message );
         } else {
