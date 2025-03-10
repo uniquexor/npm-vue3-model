@@ -87,6 +87,18 @@ export default class Model extends PiniaModel {
         return this.constructor.labels()[ field ] ?? null;
     }
 
+    setErrorsOnModelFields( model, fields, message ) {
+
+        const field = fields.shift();
+        if ( fields.length > 1 ) {
+
+            this.setErrorsOnModelFields( model[ field ], fields, message );
+        } else {
+
+            model.errors[ field ] = message;
+        }
+    }
+
     setErrorFieldsFromResult( result ) {
 
         if ( result.response?.status === 422 ) {
@@ -94,7 +106,7 @@ export default class Model extends PiniaModel {
             for ( let i in result.response.data ) {
 
                 let error = result.response.data[ i ];
-                this.errors[ error.field ] = error.message;
+                this.setErrorsOnModelFields( this, error.field.split( '.' ), error.message );
             }
         } else if ( result.response && result.response.status !== 200 && result.response.status !== 201 ) {
 
