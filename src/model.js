@@ -54,6 +54,7 @@ export default class Model extends PiniaModel {
         }
 
         this.$fill( attributes, options );
+        this.updateOldValues( attributes ? attributes : {} );
     }
 
     $toJson( model, options ) {
@@ -428,8 +429,9 @@ export default class Model extends PiniaModel {
     /**
      * Sets attributes from a given data object/array
      * @param {Object|Array} data
+     * @param {boolean} is_dirty - If true, treats the changed values as dirty, otherwise as not.
      */
-    setAttributes( data ) {
+    setAttributes( data, is_dirty = true ) {
 
         const fields = this.constructor.fields();
 
@@ -438,17 +440,47 @@ export default class Model extends PiniaModel {
             if ( typeof( fields[ i ] ) !== 'undefined' ) {
 
                 this[ i ] = data[ i ];
+
+                if ( !is_dirty ) {
+
+                    this.$old_values[ i ] = data[i];
+                }
             }
         }
     }
 
-    static afterUpdate( model ) {
+    static created( model, record ) {
 
         model.updateOldValues( model );
     }
 
-    static afterCreate( model ) {
+    static updated( model, record ) {
 
         model.updateOldValues( model );
+    }
+
+    /**
+     * Stores given values as old values.
+     * @param {Array|Object} attrs
+     */
+    updateOldValues( attrs ) {
+
+        let old_values = {};
+        for ( let i in this.constructor.fields() ) {
+
+            old_values[ i ] = attrs[ i ];
+        }
+
+        this.$old_values = old_values;
+    }
+
+    /**
+     * Checks if a given attribute has changed since it was last stored in this object.
+     * @param {String} attr
+     * @returns {boolean}
+     */
+    isDirty( attr ) {
+
+        return this.$old_values[ attr ] !== this[ attr ];
     }
 }
