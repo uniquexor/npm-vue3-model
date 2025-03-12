@@ -462,18 +462,23 @@ export default class Model extends PiniaModel {
 
     /**
      * Stores given values as old values.
+     * If an array is given, treats values as field names to be reset to the current values.
      * @param {Array|Object} attrs
      */
     updateOldValues( attrs ) {
 
-        for ( let i in this.$old_values ) {
+        if ( typeof( attrs ) === 'function' ) {
 
-            this.$old_values[ i ] = undefined;
-        }
+            for ( let i of attrs ) {
 
-        for ( let i in attrs ) {
+                this.$old_values[ i ] = this[ i ];
+            }
+        } else {
 
-            this.$old_values[ i ] = attrs[ i ];
+            for ( let i in attrs ) {
+
+                this.$old_values[ i ] = attrs[ i ];
+            }
         }
     }
 
