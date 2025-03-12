@@ -467,7 +467,7 @@ export default class Model extends PiniaModel {
      */
     updateOldValues( attrs ) {
 
-        if ( typeof( attrs ) === 'function' ) {
+        if ( Array.isArray( attrs ) ) {
 
             for ( let i of attrs ) {
 
