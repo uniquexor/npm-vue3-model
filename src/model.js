@@ -13,6 +13,7 @@ export default class Model extends PiniaModel {
 
     static primaryKey = 'id';
 
+    $old_values = reactive( {} );
     errors = reactive( {} );
     error_message = ref( null );
 
@@ -465,13 +466,15 @@ export default class Model extends PiniaModel {
      */
     updateOldValues( attrs ) {
 
-        let old_values = {};
-        for ( let i in this.constructor.fields() ) {
+        for ( let i in this.$old_values ) {
 
-            old_values[ i ] = attrs[ i ];
+            this.$old_values[ i ] = undefined;
         }
 
-        this.$old_values = old_values;
+        for ( let i in attrs ) {
+
+            this.$old_values[ i ] = attrs[ i ];
+        }
     }
 
     /**
