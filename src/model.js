@@ -142,7 +142,7 @@ export default class Model extends PiniaModel {
                 throw 'No endpoint set for a model';
             }
 
-            result = await useAxiosRepo( this.constructor ).api().post( request.request.url, this.$toJson( this ), request.axios_params );
+            result = await this.useAxiosRepo().api().post( request.request.url, this.$toJson( this ), request.axios_params );
         } catch ( e ) {
 
             error = e;
@@ -184,7 +184,7 @@ export default class Model extends PiniaModel {
                     throw 'No endpoint set for a model';
                 }
 
-                result = await useAxiosRepo( this.constructor ).api().post( request.request.url, this.$toJson( this ), request.axios_params );
+                result = await this.useAxiosRepo().api().post( request.request.url, this.$toJson( this ), request.axios_params );
             } else {
 
                 if ( !request.request.url ) {
@@ -193,7 +193,7 @@ export default class Model extends PiniaModel {
                     throw 'No endpoint set for a model';
                 }
 
-                result = await useAxiosRepo( this.constructor ).api().put( request.request.url, this.$toJson( this ), request.axios_params );
+                result = await this.useAxiosRepo().api().put( request.request.url, this.$toJson( this ), request.axios_params );
             }
         } catch ( e ) {
 
@@ -238,7 +238,7 @@ export default class Model extends PiniaModel {
             }
         }, request );
 
-        return await useAxiosRepo( this.constructor ).api().delete( request.request.url, request.axios_params );
+        return await this.useAxiosRepo().api().delete( request.request.url, request.axios_params );
     }
 
     /**
@@ -490,5 +490,10 @@ export default class Model extends PiniaModel {
     isDirty( attr ) {
 
         return this.$old_values[ attr ] !== this[ attr ];
+    }
+
+    useAxiosRepo() {
+
+        return useAxiosRepo( this.constructor );
     }
 }
