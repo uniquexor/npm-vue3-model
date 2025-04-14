@@ -167,6 +167,7 @@ export default class Model extends PiniaModel {
 
         request = this.constructor._getOptions( {
             url: this.isNewRecord() ? this.constructor.endpoint_create : this.constructor.endpoint_update,
+            data: {},
             expand: '',
             expand_name: '_expand',
             params: {},
@@ -184,7 +185,7 @@ export default class Model extends PiniaModel {
                     throw 'No endpoint set for a model';
                 }
 
-                result = await this.useAxiosRepo().api().post( request.request.url, this.$toJson( this ), request.axios_params );
+                result = await this.useAxiosRepo().api().post( request.request.url, { ...this.$toJson( this ), ...request.data }, request.axios_params );
             } else {
 
                 if ( !request.request.url ) {
@@ -193,7 +194,7 @@ export default class Model extends PiniaModel {
                     throw 'No endpoint set for a model';
                 }
 
-                result = await this.useAxiosRepo().api().put( request.request.url, this.$toJson( this ), request.axios_params );
+                result = await this.useAxiosRepo().api().put( request.request.url, { ...this.$toJson( this ), ...request.data }, request.axios_params );
             }
         } catch ( e ) {
 
