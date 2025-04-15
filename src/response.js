@@ -48,17 +48,7 @@ export default class Response {
                 }
             } );
 
-            let expand = request.expand;
-            if ( expand && !Array.isArray( expand ) ) {
-
-                expand = expand.split( ',' );
-            }
-
             this.query = useRepo( model ).query();
-            for ( let rel of expand ) {
-
-                this.query.with( rel );
-            }
             this.query
                 .whereIn( model.primaryKey, ids );
 
