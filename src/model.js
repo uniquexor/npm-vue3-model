@@ -38,6 +38,14 @@ export default class Model extends PiniaModel {
 
         super( {}, { fill: false } );
 
+        attributes = this.#applyTransformers( attributes );
+
+        this.$fill( attributes, options );
+        this.updateOldValues( attributes ? attributes : {} );
+    }
+
+    #applyTransformers( attributes ) {
+
         const transformers = this.constructor.transformers();
         for ( const field in transformers ) {
 
@@ -54,8 +62,7 @@ export default class Model extends PiniaModel {
             }
         }
 
-        this.$fill( attributes, options );
-        this.updateOldValues( attributes ? attributes : {} );
+        return attributes;
     }
 
     $toJson( model, options ) {
@@ -436,6 +443,8 @@ export default class Model extends PiniaModel {
     setAttributes( data, is_dirty = true ) {
 
         const fields = this.constructor.fields();
+
+        data = this.#applyTransformers( data );
 
         for ( let i in data ) {
 
