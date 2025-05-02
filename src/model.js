@@ -38,13 +38,13 @@ export default class Model extends PiniaModel {
 
         super( {}, { fill: false } );
 
-        attributes = this.#applyTransformers( attributes );
+        attributes = this.applyTransformers( attributes );
 
         this.$fill( attributes, options );
         this.updateOldValues( attributes ? attributes : {} );
     }
 
-    #applyTransformers( attributes ) {
+    applyTransformers( attributes ) {
 
         const transformers = this.constructor.transformers();
         for ( const field in transformers ) {
@@ -444,7 +444,7 @@ export default class Model extends PiniaModel {
 
         const fields = this.constructor.fields();
 
-        data = this.#applyTransformers( data );
+        data = this.applyTransformers( data );
 
         for ( let i in data ) {
 
