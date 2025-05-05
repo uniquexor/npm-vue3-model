@@ -35,41 +35,46 @@ export default class Response {
             let ids = [];
             const model = response.repository.model.constructor;
             const primary_keys = model.primaryKey;
-            response.entities.forEach( function ( entity ) {
 
-                if ( Array.isArray( primary_keys ) ) {
+            this.entities = [];
+            if ( response.entities ) {
 
-                    let pkeys = [];
-                    primary_keys.forEach( key => pkeys.push( entity[ key ] ) );
-                    ids.push( pkeys );
-                } else {
+                response.entities.forEach( function ( entity ) {
 
-                    ids.push( entity[ primary_keys ] )
-                }
-            } );
+                    if ( Array.isArray( primary_keys ) ) {
 
-            this.query = useRepo( model ).query();
-            this.query
-                .whereIn( model.primaryKey, ids );
+                        let pkeys = [];
+                        primary_keys.forEach( key => pkeys.push( entity[ key ] ) );
+                        ids.push( pkeys );
+                    } else {
 
-            let sorts = request.sort ? request.sort.split( ',' ) : [];
-            if ( sorts.length ) {
-
-                for ( let i in sorts ) {
-
-                    let order = 'asc';
-                    let sort = sorts[i];
-                    if ( sort[ 0 ] === '-' ) {
-
-                        order = 'desc';
-                        sort = sort.substring( 1 );
+                        ids.push( entity[ primary_keys ] )
                     }
+                } );
 
-                    this.query.orderBy( sort, order );
+                this.query = useRepo( model ).query();
+                this.query
+                    .whereIn( model.primaryKey, ids );
+
+                let sorts = request.sort ? request.sort.split( ',' ) : [];
+                if ( sorts.length ) {
+
+                    for ( let i in sorts ) {
+
+                        let order = 'asc';
+                        let sort = sorts[ i ];
+                        if ( sort[ 0 ] === '-' ) {
+
+                            order = 'desc';
+                            sort = sort.substring( 1 );
+                        }
+
+                        this.query.orderBy( sort, order );
+                    }
                 }
-            }
 
-            this.entities = this.query.get();
+                this.entities = this.query.get();
+            }
         }
     }
 }
