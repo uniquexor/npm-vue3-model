@@ -30,6 +30,27 @@ export default class Model extends PiniaModel {
         return {}
     }
 
+    /**
+     * Defines transformers, that transform data in the model before loading it and before serializing it.
+     * Can only be used on attributes that are Arrays.
+     *
+     * Structure:
+     * ```
+     * {
+     *     field_name: {
+     *         // performed when setting data in the constructor method or {@see setAttributes()} method.
+     *         get( data ) {
+     *             return ...; // return transformed field data.
+     *         },
+     *
+     *         // performed when serializing data in {@see $toJson()} method.
+     *         set( data ) {
+     *         }
+     *     }
+     * }
+     * ```
+     * @returns {Object.<string, {set: function(any): any, get: function(any): any}>}
+     */
     static transformers() {
         return {}
     }
@@ -44,6 +65,11 @@ export default class Model extends PiniaModel {
         this.updateOldValues( attributes ? attributes : {} );
     }
 
+    /**
+     * Applies transformers defined in {@see transformers()} to all given data.
+     * @param {Object} attributes
+     * @returns {Object.<string, any>}
+     */
     applyTransformers( attributes ) {
 
         const transformers = this.constructor.transformers();
@@ -52,19 +78,27 @@ export default class Model extends PiniaModel {
             if ( attributes && attributes[ field ] ) {
 
                 const transformer = transformers[ field ];
-                const ids = [];
-                for ( const item of attributes[ field ] ) {
+                if ( transformer?.get ) {
 
-                    ids.push( transformer.get.call( this, item ) );
+                    const ids = [];
+                    for ( const item of attributes[ field ] ) {
+
+                        ids.push( transformer.get.call( this, item ) );
+                    }
+
+                    attributes[ field ] = ids;
                 }
-
-                attributes[ field ] = ids;
             }
         }
 
         return attributes;
     }
 
+    /**
+     * @inheritDoc
+     *
+     * Expands default implementation by calling {@see transformers()} method.
+     */
     $toJson( model, options ) {
 
         const data = super.$toJson( model, options );
@@ -75,10 +109,13 @@ export default class Model extends PiniaModel {
             if ( data && data[ field ] ) {
 
                 const transformer = transformers[ field ];
-                data[ field ] = data[ field ].map( ( id ) => {
+                if ( transformer?.set ) {
 
-                    return transformer.set.call( this, id, data );
-                } );
+                    data[ field ] = data[ field ].map( ( id ) => {
+
+                        return transformer.set.call( this, id, data );
+                    } );
+                }
             }
         }
 
