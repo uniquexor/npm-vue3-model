@@ -49,7 +49,7 @@ export default class Model extends PiniaModel {
      *     }
      * }
      * ```
-     * @returns {Object.<string, {set: function(any): any, get: function(any): any}>}
+     * @returns {Object.<string, {set?: function(any): any, get?: function(any): any}>}
      */
     static transformers() {
         return {}
@@ -66,7 +66,7 @@ export default class Model extends PiniaModel {
     }
 
     /**
-     * Applies transformers defined in {@see transformers()} to all given data.
+     * Applies transformers defined in {@link transformers()} to all given data.
      * @param {Object} attributes
      * @returns {Object.<string, any>}
      */
@@ -97,7 +97,7 @@ export default class Model extends PiniaModel {
     /**
      * @inheritDoc
      *
-     * Expands default implementation by calling {@see transformers()} method.
+     * Expands default implementation by calling {@link transformers()} method.
      */
     $toJson( model, options ) {
 
