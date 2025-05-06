@@ -1,5 +1,6 @@
 import {useAxiosRepo} from "@pinia-orm/axios";
 import {useRepo} from "pinia-orm";
+import QueryExpander from "./query-expander";
 
 export default class Response {
 
@@ -55,6 +56,8 @@ export default class Response {
                 this.query = useRepo( model ).query();
                 this.query
                     .whereIn( model.primaryKey, ids );
+
+                QueryExpander.withAll( this.query, request.expand );
 
                 let sorts = request.sort ? request.sort.split( ',' ) : [];
                 if ( sorts.length ) {
