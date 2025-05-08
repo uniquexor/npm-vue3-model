@@ -49,14 +49,21 @@ export default class QueryExpander {
      * Splits all_relations by ',' and treats each item as a separate relation to be joined using `with()` method on the `query` object.
      * Essentially this:
      * ```
-     * QueryExpander.withAll( useRepo( Model ), 'rel1,rel2' );
+     * const query = useRepo( Model ).query();
+     * QueryExpander.withAll( query, 'rel1,rel2' );
      * ```
      * becomes this:
      * ```
      * useRepo( Model ).with( 'rel1' ).with( 'rel2' )
      * ```
+     *
+     * Beware!!! It is essential, to either call .query() after useRepo or some other method that creates query first.
+     * If you pass useRepo() directly to this method it will fail!
+     * @todo probably could call it here if Repo is passed?..
+     *
      * @param query
      * @param {Array|String} all_relations
+     * @return {Query}
      */
     static withAll( query, all_relations ) {
 
@@ -70,5 +77,7 @@ export default class QueryExpander {
             const relations = sub_relations.trim().split( '.' );
             QueryExpander.withOne( query, relations );
         }
+
+        return query;
     }
 }

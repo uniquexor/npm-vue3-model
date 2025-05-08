@@ -483,17 +483,10 @@ export default class Model extends PiniaModel {
 
         data = this.applyTransformers( data );
 
-        for ( let i in data ) {
+        this.$fill( data );
+        if ( !is_dirty ) {
 
-            if ( typeof( fields[ i ] ) !== 'undefined' ) {
-
-                this[ i ] = data[ i ];
-
-                if ( !is_dirty ) {
-
-                    this.$old_values[ i ] = data[i];
-                }
-            }
+            this.updateOldValues( data );
         }
     }
 
