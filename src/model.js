@@ -287,10 +287,26 @@ export default class Model extends PiniaModel {
     }
 
     /**
+     * @typedef {Object} RequestOptions
+     * @property {string} [url] - The URL for the listing.
+     * @property {string|string[]} [expand] - The relations to expand. If an array is passed, it will be joined into a comma-separated string.
+     *                                        Same as passing the "expand" parameter to action/index.
+     * @property {string|string[]} [expand_fields] - The fields to expand. If an array is passed, it will be joined into a comma-separated string.
+     *                                               These will be joined with `expand`, but will not use `with()` method on a Query.
+     * @property {Object} [filter] - A filter for Yii2. Same as passing a "filter" parameter to action/index. Will be serialized as
+     *                               "filter[field]=...&filter[field_2]=..." using a custom Axios params serializer.
+     * @property {string} [sort] - Field to sort by. Use `-fieldName` for descending order.
+     * @property {number|null} [page] - Page number.
+     * @property {number|null} [page_size] - Number of records per page.
+     * @property {Object} [params] - Additional query parameters to add to the request.
+     * @property {Object} [axios] - Additional Axios configuration options.
+     */
+
+    /**
      * Expands default request options with the given request, also preparing axios_params options for a request.
-     * @param {*} default_request
-     * @param {*} request
-     * @returns {{request: *, axios_params}}
+     * @param {RequestOptions} default_request
+     * @param {RequestOptions} request
+     * @returns {{request: RequestOptions, axios_params: Object}}
      * @private
      */
     static _getOptions( default_request, request = {} ) {
@@ -301,6 +317,23 @@ export default class Model extends PiniaModel {
         if ( Array.isArray( request.expand ) ) {
 
             expand = request.expand.join( ',' );
+        }
+
+        let expand_fields = request.expand_fields;
+        if ( Array.isArray( expand_fields ) ) {
+
+            expand_fields = expand_fields.join( ',' );
+        }
+
+        // Join expand_fields and expand in to a single option:
+        if ( expand_fields ) {
+
+            if ( expand ) {
+
+                expand += ',';
+            }
+
+            expand += expand_fields;
         }
 
         let get_params = request.params;
@@ -354,18 +387,7 @@ export default class Model extends PiniaModel {
     }
 
     /**
-     * `request` can have the following options:
-     * - {string} `url`: The url for the listing
-     * - {string}|{array} `expand`: The relations to expand. If an array is passed, will be merged to a string, using commas.
-     *                              The same as passing "expand" parameter to action/index.
-     * - {object} `filter`: A filter for yii2. The same as passing a "filter" parameter to action/index. However, a new Axios ParamsSerializer will
-     *                      be created to serialize the object to a query form of "filter[field]=...&filter[field_2]=..."
-     * - {string} `sort`: A field to sort data by. By default sorts in ascending order. To sort in descending prepend field name with "-".
-     * - {int|null} `page`: Page number
-     * - {int|null} `page_size`: How many record to return in a single page.
-     * - {object} `params`: Other query parameters to add to the request.
-     * - {object} `axios`: Other Axios configuration values.
-     * @param {object} request
+     * @param {RequestOptions} request
      * @returns {Promise<Response>}
      */
     static async list( request = {} ) {
@@ -373,6 +395,7 @@ export default class Model extends PiniaModel {
         request = this._getOptions( {
             url: this.endpoint_list,
             expand: '',
+            expand_fields: '',
             expand_name: 'expand',
             filter: null,
             sort: null,
@@ -388,19 +411,8 @@ export default class Model extends PiniaModel {
     }
 
     /**
-     * `request` can have the following options:
-     * - {string} `url`: The url for the listing
-     * - {string}|{array} `expand`: The relations to expand. If an array is passed, will be merged to a string, using commas.
-     *                              The same as passing "expand" parameter to action/index.
-     * - {object} `filter`: A filter for yii2. The same as passing a "filter" parameter to action/index. However, a new Axios ParamsSerializer will
-     *                      be created to serialize the object to a query form of "filter[field]=...&filter[field_2]=..."
-     * - {string} `sort`: A field to sort data by. By default sorts in ascending order. To sort in descending prepend field name with "-".
-     * - {int|null} `page`: Page number
-     * - {int|null} `page_size`: How many record to return in a single page.
-     * - {object} `params`: Other query parameters to add to the request.
-     * - {object} `axios`: Other Axios configuration values.
      * @param {int} id
-     * @param {object} request
+     * @param {RequestOptions} request
      * @returns {Promise<Response>}
      */
     static async view( id, request = {} ) {
