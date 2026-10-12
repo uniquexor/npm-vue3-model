@@ -1,10 +1,20 @@
 {
   "name": "@uniquexor/npm-vue3-model",
-  "version": "1.0.27",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Vue 3 model helpers for Pinia ORM and Axios",
+  "type": "module",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "src/",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
@@ -17,8 +27,16 @@
   },
   "homepage": "https://github.com/uniquexor/npm-vue3-model#readme",
   "dependencies": {
-    "@pinia-orm/axios": "^1.10.2",
-    "pinia-orm": "^1.10.2",
+    "@pinia-orm/axios": "^2.0.0",
+    "pinia-orm": "^2.0.0",
     "vue": "^3.5.13"
+  },
+  "peerDependencies": {
+    "axios": ">=1.13.2 <2",
+    "pinia": ">=3.0.0 <5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

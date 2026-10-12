@@ -1,6 +1,6 @@
 import {useAxiosRepo} from "@pinia-orm/axios";
 import {useRepo} from "pinia-orm";
-import QueryExpander from "./query-expander";
+import QueryExpander from "./query-expander.js";
 
 export default class Response {
 
